@@ -1,0 +1,938 @@
+[
+  {
+    "example_file": "/home/naren-root/Documents/FYP2/data/sentinel2/S2_PROC_2015_09_Madurai.tif",
+    "folder": "sentinel2",
+    "metadata": {
+      "band_tags": {
+        "1": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {}
+      },
+      "block_shapes": [
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "bounds": [
+        77.98742105389309,
+        9.878054527235081,
+        78.45831792582854,
+        10.31607305977176
+      ],
+      "colorinterp": [
+        "gray",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined"
+      ],
+      "count": 17,
+      "crs": "EPSG:4326",
+      "descriptions": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "driver": "GTiff",
+      "dtypes": [
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32"
+      ],
+      "height": 2438,
+      "nodatavals": [
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity,
+        -Infinity
+      ],
+      "offsets": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "profile": {
+        "blockxsize": 256,
+        "blockysize": 256,
+        "compress": "lzw",
+        "count": 17,
+        "crs": "EPSG:4326",
+        "driver": "GTiff",
+        "dtype": "float32",
+        "height": 2438,
+        "interleave": "pixel",
+        "nodata": -Infinity,
+        "tiled": true,
+        "transform": [
+          0.0001796630568239043,
+          0.0,
+          77.98742105389309,
+          0.0,
+          -0.0001796630568239043,
+          10.31607305977176,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "width": 2621
+      },
+      "scales": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "tags": {
+        "AREA_OR_POINT": "Area"
+      },
+      "tiled": true,
+      "transform": [
+        0.0001796630568239043,
+        0.0,
+        77.98742105389309,
+        0.0,
+        -0.0001796630568239043,
+        10.31607305977176,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "units": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "width": 2621
+    }
+  },
+  {
+    "example_file": "/home/naren-root/Documents/FYP2/data/sentinel1/S1_2015_02_Madurai.tif",
+    "folder": "sentinel1",
+    "metadata": {
+      "band_tags": {
+        "1": {},
+        "2": {},
+        "3": {}
+      },
+      "block_shapes": [
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "bounds": [
+        77.9875108854215,
+        9.878144358763494,
+        78.45822809430013,
+        10.31607305977176
+      ],
+      "colorinterp": [
+        "red",
+        "green",
+        "blue"
+      ],
+      "count": 3,
+      "crs": "EPSG:4326",
+      "descriptions": [
+        null,
+        null,
+        null
+      ],
+      "driver": "GTiff",
+      "dtypes": [
+        "float32",
+        "float32",
+        "float32"
+      ],
+      "height": 4875,
+      "nodatavals": [
+        -Infinity,
+        -Infinity,
+        -Infinity
+      ],
+      "offsets": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "profile": {
+        "blockxsize": 256,
+        "blockysize": 256,
+        "compress": "lzw",
+        "count": 3,
+        "crs": "EPSG:4326",
+        "driver": "GTiff",
+        "dtype": "float32",
+        "height": 4875,
+        "interleave": "pixel",
+        "nodata": -Infinity,
+        "tiled": true,
+        "transform": [
+          8.983152841195215e-05,
+          0.0,
+          77.9875108854215,
+          0.0,
+          -8.983152841195215e-05,
+          10.31607305977176,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "width": 5240
+      },
+      "scales": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "tags": {
+        "AREA_OR_POINT": "Area"
+      },
+      "tiled": true,
+      "transform": [
+        8.983152841195215e-05,
+        0.0,
+        77.9875108854215,
+        0.0,
+        -8.983152841195215e-05,
+        10.31607305977176,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "units": [
+        null,
+        null,
+        null
+      ],
+      "width": 5240
+    }
+  },
+  {
+    "example_file": "/home/naren-root/Documents/FYP2/data/landsat/2015_01_Madurai_monthly_LST_cloud.tif",
+    "folder": "landsat",
+    "metadata": {
+      "band_tags": {
+        "1": {},
+        "2": {}
+      },
+      "block_shapes": [
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "bounds": [
+        77.98742105389309,
+        9.878054527235083,
+        78.45822809430013,
+        10.316252722828585
+      ],
+      "colorinterp": [
+        "gray",
+        "undefined"
+      ],
+      "count": 2,
+      "crs": "EPSG:4326",
+      "descriptions": [
+        null,
+        null
+      ],
+      "driver": "GTiff",
+      "dtypes": [
+        "float32",
+        "float32"
+      ],
+      "height": 1626,
+      "nodatavals": [
+        -Infinity,
+        -Infinity
+      ],
+      "offsets": [
+        0.0,
+        0.0
+      ],
+      "profile": {
+        "blockxsize": 256,
+        "blockysize": 256,
+        "compress": "deflate",
+        "count": 2,
+        "crs": "EPSG:4326",
+        "driver": "GTiff",
+        "dtype": "float32",
+        "height": 1626,
+        "interleave": "pixel",
+        "nodata": -Infinity,
+        "tiled": true,
+        "transform": [
+          0.00026949458523585647,
+          0.0,
+          77.98742105389309,
+          0.0,
+          -0.00026949458523585647,
+          10.316252722828585,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "width": 1747
+      },
+      "scales": [
+        1.0,
+        1.0
+      ],
+      "tags": {
+        "AREA_OR_POINT": "Area",
+        "TIFFTAG_RESOLUTIONUNIT": "1 (unitless)",
+        "TIFFTAG_XRESOLUTION": "1",
+        "TIFFTAG_YRESOLUTION": "1"
+      },
+      "tiled": true,
+      "transform": [
+        0.00026949458523585647,
+        0.0,
+        77.98742105389309,
+        0.0,
+        -0.00026949458523585647,
+        10.316252722828585,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "units": [
+        null,
+        null
+      ],
+      "width": 1747
+    }
+  },
+  {
+    "example_file": "/home/naren-root/Documents/FYP2/data/modis/MODIS_2015_01_01_Madurai.tif",
+    "folder": "modis",
+    "metadata": {
+      "band_tags": {
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {}
+      },
+      "block_shapes": [
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "bounds": [
+        8539890.644190144,
+        1097554.6778989916,
+        8592890.64419012,
+        1147554.6778990142
+      ],
+      "colorinterp": [
+        "gray",
+        "undefined",
+        "undefined",
+        "undefined"
+      ],
+      "count": 4,
+      "crs": "PROJCS[\"MODIS Sinusoidal\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Sinusoidal\"],PARAMETER[\"longitude_of_center\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+      "descriptions": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "driver": "GTiff",
+      "dtypes": [
+        "float32",
+        "float32",
+        "float32",
+        "float32"
+      ],
+      "height": 50,
+      "nodatavals": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "offsets": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "profile": {
+        "blockxsize": 256,
+        "blockysize": 256,
+        "compress": "lzw",
+        "count": 4,
+        "crs": "PROJCS[\"MODIS Sinusoidal\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Sinusoidal\"],PARAMETER[\"longitude_of_center\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+        "driver": "GTiff",
+        "dtype": "float32",
+        "height": 50,
+        "interleave": "pixel",
+        "nodata": null,
+        "tiled": true,
+        "transform": [
+          999.9999999995498,
+          0.0,
+          8539890.644190144,
+          0.0,
+          -1000.00000000045,
+          1147554.6778990142,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "width": 53
+      },
+      "scales": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "tags": {
+        "AREA_OR_POINT": "Area"
+      },
+      "tiled": true,
+      "transform": [
+        999.9999999995498,
+        0.0,
+        8539890.644190144,
+        0.0,
+        -1000.00000000045,
+        1147554.6778990142,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "units": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "width": 53
+    }
+  },
+  {
+    "example_file": "/home/naren-root/Documents/FYP2/data/viirs/2015_01_01/VIIRS_VNP21_2015_01_01_Madurai.tif",
+    "folder": "viirs",
+    "metadata": {
+      "band_tags": {
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {}
+      },
+      "block_shapes": [
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "bounds": [
+        8539890.645999998,
+        1097604.1573330006,
+        8592890.645999998,
+        1147604.1573330006
+      ],
+      "colorinterp": [
+        "gray",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined"
+      ],
+      "count": 6,
+      "crs": "PROJCS[\"MODIS Sinusoidal\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Sinusoidal\"],PARAMETER[\"longitude_of_center\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+      "descriptions": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "driver": "GTiff",
+      "dtypes": [
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32",
+        "float32"
+      ],
+      "height": 50,
+      "nodatavals": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "offsets": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "profile": {
+        "blockxsize": 256,
+        "blockysize": 256,
+        "compress": "deflate",
+        "count": 6,
+        "crs": "PROJCS[\"MODIS Sinusoidal\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Sinusoidal\"],PARAMETER[\"longitude_of_center\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+        "driver": "GTiff",
+        "dtype": "float32",
+        "height": 50,
+        "interleave": "pixel",
+        "nodata": null,
+        "tiled": true,
+        "transform": [
+          999.9999999999999,
+          0.0,
+          8539890.645999998,
+          0.0,
+          -999.9999999999999,
+          1147604.1573330006,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "width": 53
+      },
+      "scales": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "tags": {
+        "AREA_OR_POINT": "Area",
+        "TIFFTAG_RESOLUTIONUNIT": "1 (unitless)",
+        "TIFFTAG_XRESOLUTION": "1",
+        "TIFFTAG_YRESOLUTION": "1"
+      },
+      "tiled": true,
+      "transform": [
+        999.9999999999999,
+        0.0,
+        8539890.645999998,
+        0.0,
+        -999.9999999999999,
+        1147604.1573330006,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "units": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "width": 53
+    }
+  },
+  {
+    "example_file": "/home/naren-root/Documents/FYP2/data/alphaearth/2018/2018_int8_s10_chunk_00.tif",
+    "folder": "alphaearth",
+    "metadata": {
+      "band_tags": {
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {}
+      },
+      "block_shapes": [
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "bounds": [
+        77.9875108854215,
+        9.878144358763494,
+        78.45822809430013,
+        10.31607305977176
+      ],
+      "colorinterp": [
+        "gray",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined",
+        "undefined"
+      ],
+      "count": 8,
+      "crs": "EPSG:4326",
+      "descriptions": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "driver": "GTiff",
+      "dtypes": [
+        "int16",
+        "int16",
+        "int16",
+        "int16",
+        "int16",
+        "int16",
+        "int16",
+        "int16"
+      ],
+      "height": 4875,
+      "nodatavals": [
+        -128.0,
+        -128.0,
+        -128.0,
+        -128.0,
+        -128.0,
+        -128.0,
+        -128.0,
+        -128.0
+      ],
+      "offsets": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "profile": {
+        "blockxsize": 256,
+        "blockysize": 256,
+        "compress": "lzw",
+        "count": 8,
+        "crs": "EPSG:4326",
+        "driver": "GTiff",
+        "dtype": "int16",
+        "height": 4875,
+        "interleave": "pixel",
+        "nodata": -128.0,
+        "tiled": true,
+        "transform": [
+          8.983152841195215e-05,
+          0.0,
+          77.9875108854215,
+          0.0,
+          -8.983152841195215e-05,
+          10.31607305977176,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "width": 5240
+      },
+      "scales": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "tags": {
+        "AREA_OR_POINT": "Area"
+      },
+      "tiled": true,
+      "transform": [
+        8.983152841195215e-05,
+        0.0,
+        77.9875108854215,
+        0.0,
+        -8.983152841195215e-05,
+        10.31607305977176,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "units": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "width": 5240
+    }
+  }
+]

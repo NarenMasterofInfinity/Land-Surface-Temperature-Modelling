@@ -1,0 +1,372 @@
+#!/usr/bin/env python3
+import argparse
+import math
+import os
+from pathlib import Path
+from typing import Dict, Iterable, Tuple
+
+import numpy as np
+import zarr
+
+
+def _sum_dir_bytes(path: Path) -> int:
+    if not path.exists():
+        return 0
+    total = 0
+    for root, _, files in os.walk(path):
+        for name in files:
+            try:
+                total += (Path(root) / name).stat().st_size
+            except FileNotFoundError:
+                continue
+    return total
+
+
+def _gib(nbytes: int) -> float:
+    return nbytes / (1024 ** 3)
+
+
+def _human_gib(nbytes: int) -> str:
+    return f"{_gib(nbytes):.3f} GiB"
+
+
+def _iter_groups(g: zarr.Group, prefix: str = "") -> Iterable[Tuple[str, zarr.Group]]:
+    yield prefix.rstrip("/"), g
+    for name, subg in g.groups():
+        sub_prefix = f"{prefix}{name}/"
+        yield from _iter_groups(subg, sub_prefix)
+
+
+def _time_axes(root: zarr.Group) -> Dict[str, int]:
+    out: Dict[str, int] = {}
+    if "time" not in root:
+        return out
+    tg = root["time"]
+    for name in ("daily", "monthly", "annual"):
+        if name in tg:
+            out[name] = int(tg[name].shape[0])
+    return out
+
+
+def _match_time_axis(length: int, axes: Dict[str, int]) -> str:
+    matches = [k for k, v in axes.items() if v == length]
+    return ",".join(matches) if matches else "none"
+
+
+def _window_slices(shape: Tuple[int, ...], sample_hw: int = 32) -> Iterable[Tuple[slice, ...]]:
+    if len(shape) == 0:
+        return []
+    h = shape[-2] if len(shape) >= 2 else 0
+    w = shape[-1] if len(shape) >= 1 else 0
+    if h == 0 or w == 0:
+        return []
+
+    sh = min(sample_hw, h)
+    sw = min(sample_hw, w)
+    corners = [
+        (0, 0),
+        (0, max(w - sw, 0)),
+        (max(h - sh, 0), 0),
+        (max(h - sh, 0), max(w - sw, 0)),
+        (max((h - sh) // 2, 0), max((w - sw) // 2, 0)),
+    ]
+
+    slices = []
+    for r0, c0 in corners:
+        parts = []
+        for i, dim in enumerate(shape):
+            if dim == 0:
+                return []
+            if i == len(shape) - 2:
+                parts.append(slice(r0, r0 + sh))
+            elif i == len(shape) - 1:
+                parts.append(slice(c0, c0 + sw))
+            else:
+                parts.append(slice(0, min(dim, 1)))
+        slices.append(tuple(parts))
+    return slices
+
+
+def _sample_metrics(arr: zarr.Array) -> Dict[str, float]:
+    total = 0
+    nan_count = 0
+    zero_count = 0
+    finite_count = 0
+    for s in _window_slices(arr.shape):
+        try:
+            sample = arr[s]
+        except Exception:
+            continue
+        if sample.size == 0:
+            continue
+        total += sample.size
+        if np.issubdtype(sample.dtype, np.floating):
+            finite = np.isfinite(sample)
+            finite_count += int(np.sum(finite))
+            nan_count += int(np.sum(~finite))
+        zero_count += int(np.sum(sample == 0))
+
+    if total == 0:
+        return {"total": 0, "nan_ratio": 0.0, "zero_ratio": 0.0, "finite_ratio": 0.0}
+
+    return {
+        "total": float(total),
+        "nan_ratio": nan_count / total,
+        "zero_ratio": zero_count / total,
+        "finite_ratio": finite_count / total,
+    }
+
+
+def _iter_chunk_slices(shape: Tuple[int, ...], chunks: Tuple[int, ...]) -> Iterable[Tuple[slice, ...]]:
+    if len(shape) != len(chunks):
+        return []
+    ranges = []
+    for dim, ch in zip(shape, chunks):
+        if dim == 0:
+            return []
+        n = math.ceil(dim / ch)
+        ranges.append(range(n))
+    for idx in np.ndindex(*[len(r) for r in ranges]):
+        slices = []
+        for i, r in enumerate(idx):
+            start = r * chunks[i]
+            stop = min(start + chunks[i], shape[i])
+            slices.append(slice(start, stop))
+        yield tuple(slices)
+
+
+def _full_metrics(data: zarr.Array, valid: zarr.Array) -> Dict[str, float]:
+    total_valid = 0
+    total_elements = 0
+    nan_count = 0
+    zero_count = 0
+
+    for s in _iter_chunk_slices(valid.shape, valid.chunks):
+        v = valid[s]
+        if v.size == 0:
+            continue
+        mask = v.astype(bool)
+        valid_pixels = int(np.sum(mask))
+        total_valid += valid_pixels
+
+        if valid_pixels == 0:
+            continue
+
+        ds = data[(slice(s[0].start, s[0].stop), slice(None), s[2], s[3])]
+        c = ds.shape[1]
+        total_elements += valid_pixels * c
+
+        if np.issubdtype(ds.dtype, np.floating):
+            mask_b = mask[:, None, :, :]
+            nan_count += int(np.sum(~np.isfinite(ds) & mask_b))
+
+        zero_count += int(np.sum((ds == 0) & mask[:, None, :, :]))
+
+    if total_elements == 0:
+        return {"total_valid": 0.0, "nan_ratio": 0.0, "zero_ratio": 0.0}
+
+    return {
+        "total_valid": float(total_valid),
+        "nan_ratio": nan_count / total_elements,
+        "zero_ratio": zero_count / total_elements,
+    }
+
+
+def _check_product(
+    root: zarr.Group,
+    zarr_path: Path,
+    group_path: str,
+    grid_hw: Tuple[int, int],
+    time_axes: Dict[str, int],
+    explosion_uncompressed_gib: float,
+    explosion_on_disk_gib: float,
+    compression_ratio_warn: float,
+    nan_warn: float,
+    zero_warn: float,
+    valid_zero_warn: float,
+    scan_mode: str,
+) -> Tuple[int, int]:
+    errors = 0
+    warnings = 0
+
+    if group_path not in root:
+        print(f"[ERROR] Missing group: {group_path}")
+        return 1, 0
+
+    g = root[group_path]
+    expected = ("data", "valid", "labels", "band_names")
+    for name in expected:
+        if name not in g:
+            print(f"[ERROR] {group_path}: missing array '{name}'")
+            errors += 1
+
+    if errors:
+        return errors, warnings
+
+    data = g["data"]
+    valid = g["valid"]
+    labels = g["labels"]
+    band_names = g["band_names"]
+
+    if data.ndim != 4:
+        print(f"[ERROR] {group_path}: data ndim={data.ndim} (expected 4)")
+        errors += 1
+    if valid.ndim != 4:
+        print(f"[ERROR] {group_path}: valid ndim={valid.ndim} (expected 4)")
+        errors += 1
+
+    if data.ndim == 4:
+        t, c, h, w = data.shape
+        gh, gw = grid_hw
+        if (h, w) != (gh, gw):
+            print(f"[WARN]  {group_path}: HxW={h}x{w} != grid {gh}x{gw}")
+            warnings += 1
+        if valid.shape != (t, 1, h, w):
+            print(f"[WARN]  {group_path}: valid shape={valid.shape} != {(t, 1, h, w)}")
+            warnings += 1
+        if labels.shape[0] != t:
+            print(f"[WARN]  {group_path}: labels length={labels.shape[0]} != T={t}")
+            warnings += 1
+        if band_names.shape[0] != c:
+            print(f"[WARN]  {group_path}: band_names length={band_names.shape[0]} != C={c}")
+            warnings += 1
+
+        if not group_path.startswith("static_30m/"):
+            axis_match = _match_time_axis(t, time_axes)
+            if axis_match == "none":
+                print(f"[WARN]  {group_path}: T={t} does not match time axes")
+                warnings += 1
+
+        data_bytes = math.prod(data.shape) * np.dtype(data.dtype).itemsize
+        valid_bytes = math.prod(valid.shape) * np.dtype(valid.dtype).itemsize
+        uncompressed = data_bytes + valid_bytes
+
+        data_path = zarr_path / group_path / "data"
+        valid_path = zarr_path / group_path / "valid"
+        on_disk = _sum_dir_bytes(data_path) + _sum_dir_bytes(valid_path)
+
+        ratio = on_disk / uncompressed if uncompressed > 0 else 0.0
+        if _gib(uncompressed) >= explosion_uncompressed_gib:
+            print(f"[WARN]  {group_path}: large uncompressed size {_human_gib(uncompressed)}")
+            warnings += 1
+        if _gib(on_disk) >= explosion_on_disk_gib:
+            print(f"[WARN]  {group_path}: large on-disk size {_human_gib(on_disk)}")
+            warnings += 1
+        if uncompressed > 0 and ratio > compression_ratio_warn:
+            print(
+                f"[WARN]  {group_path}: on-disk {_human_gib(on_disk)} > "
+                f"{compression_ratio_warn:.2f}x uncompressed {_human_gib(uncompressed)}"
+            )
+            warnings += 1
+
+        if scan_mode == "full":
+            full = _full_metrics(data, valid)
+            if full["total_valid"] == 0:
+                print(f"[WARN]  {group_path}: valid has zero nonzero pixels (full scan)")
+                warnings += 1
+            if full["nan_ratio"] >= nan_warn:
+                print(f"[WARN]  {group_path}: data NaN ratio {full['nan_ratio']:.3f} (full scan)")
+                warnings += 1
+            if full["zero_ratio"] >= zero_warn:
+                print(f"[WARN]  {group_path}: data zero ratio {full['zero_ratio']:.3f} (full scan)")
+                warnings += 1
+            if total_valid := full["total_valid"]:
+                total_pixels = math.prod(valid.shape)
+                valid_zero_ratio = 1.0 - (total_valid / total_pixels)
+                if valid_zero_ratio >= valid_zero_warn:
+                    print(f"[WARN]  {group_path}: valid zero ratio {valid_zero_ratio:.3f} (full scan)")
+                    warnings += 1
+        else:
+            data_metrics = _sample_metrics(data)
+            valid_metrics = _sample_metrics(valid)
+            if data_metrics["total"] == 0:
+                print(f"[WARN]  {group_path}: data sample missing (no elements)")
+                warnings += 1
+            else:
+                if data_metrics["nan_ratio"] >= nan_warn:
+                    print(f"[WARN]  {group_path}: data NaN ratio {data_metrics['nan_ratio']:.3f}")
+                    warnings += 1
+                if data_metrics["zero_ratio"] >= zero_warn:
+                    print(f"[WARN]  {group_path}: data zero ratio {data_metrics['zero_ratio']:.3f}")
+                    warnings += 1
+            if valid_metrics["total"] == 0:
+                print(f"[WARN]  {group_path}: valid sample missing (no elements)")
+                warnings += 1
+            else:
+                if valid_metrics["zero_ratio"] >= valid_zero_warn:
+                    print(f"[WARN]  {group_path}: valid zero ratio {valid_metrics['zero_ratio']:.3f}")
+                    warnings += 1
+
+    return errors, warnings
+
+
+def main() -> int:
+    p = argparse.ArgumentParser("Check Zarr integrity and size anomalies.")
+    p.add_argument("--zarr", default="madurai_30m_new.zarr", help="Path to zarr root")
+    p.add_argument("--explosion-uncompressed-gib", type=float, default=5.0)
+    p.add_argument("--explosion-on-disk-gib", type=float, default=2.0)
+    p.add_argument("--compression-ratio-warn", type=float, default=1.10)
+    p.add_argument("--nan-warn", type=float, default=0.95, help="Warn if data NaN ratio >= this")
+    p.add_argument("--zero-warn", type=float, default=0.95, help="Warn if data zero ratio >= this")
+    p.add_argument("--valid-zero-warn", type=float, default=0.95, help="Warn if valid zero ratio >= this")
+    p.add_argument(
+        "--scan-mode",
+        choices=["sample", "full"],
+        default="full",
+        help="Use full scan for valid/data ratios (slower) or sample windows (faster).",
+    )
+    args = p.parse_args()
+
+    zarr_path = Path(args.zarr).resolve()
+    if not zarr_path.exists():
+        print(f"[ERROR] Zarr path not found: {zarr_path}")
+        return 2
+
+    root = zarr.open_group(str(zarr_path), mode="r")
+
+    if "grid" not in root:
+        print("[ERROR] Missing grid group")
+        return 2
+
+    grid = root["grid"].attrs
+    grid_hw = (int(grid.get("height", 0)), int(grid.get("width", 0)))
+    print(f"[INFO] grid: HxW={grid_hw[0]}x{grid_hw[1]} crs={grid.get('crs')}")
+
+    time_axes = _time_axes(root)
+    if time_axes:
+        print(f"[INFO] time axes: {time_axes}")
+    else:
+        print("[WARN] no time axes found")
+
+    errors = 0
+    warnings = 0
+    for parent in ("products_30m", "static_30m", "labels_30m"):
+        if parent not in root:
+            print(f"[WARN] missing group: {parent}")
+            warnings += 1
+            continue
+        for name, _ in root[parent].groups():
+            gp = f"{parent}/{name}"
+            e, w = _check_product(
+                root,
+                zarr_path,
+                gp,
+                grid_hw,
+                time_axes,
+                args.explosion_uncompressed_gib,
+                args.explosion_on_disk_gib,
+                args.compression_ratio_warn,
+                args.nan_warn,
+                args.zero_warn,
+                args.valid_zero_warn,
+                args.scan_mode,
+            )
+            errors += e
+            warnings += w
+
+    print(f"[DONE] errors={errors} warnings={warnings}")
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

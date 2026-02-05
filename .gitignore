@@ -1,0 +1,61 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Test / lint / type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+Logs/
+*.log
+
+# ML tracking
+mlruns/
+mlflow.db
+
+# Outputs/artifacts
+metrics/
+figures/
+models/
+reports/
+
+# Data / Zarr stores
+*.zarr/
+madurai/
+madurai_30m/
+madurai_alphaearth_30m.zarr/
+madurai_30m.zarr/
+madurai.zarr/
+
+# Misc generated
+zarr.log

@@ -1,0 +1,1444 @@
+{
+  "zarr_path": "madurai_30m_new.zarr",
+  "generated_at": "2026-01-11T15:30:00.782835",
+  "dims": {},
+  "coords": [],
+  "data_vars": [
+    "time/daily",
+    "time/monthly",
+    "time/annual",
+    "static_30m/worldcover/labels",
+    "static_30m/worldcover/band_names",
+    "static_30m/worldcover/data",
+    "static_30m/worldcover/valid",
+    "static_30m/dem/valid",
+    "static_30m/dem/labels",
+    "static_30m/dem/data",
+    "static_30m/dem/band_names",
+    "static_30m/dynamic_world/valid",
+    "static_30m/dynamic_world/band_names",
+    "static_30m/dynamic_world/data",
+    "static_30m/dynamic_world/labels",
+    "labels_30m/landsat/labels",
+    "labels_30m/landsat/band_names",
+    "labels_30m/landsat/valid",
+    "labels_30m/landsat/data",
+    "products_30m/sentinel1/valid",
+    "products_30m/sentinel1/labels",
+    "products_30m/sentinel1/band_names",
+    "products_30m/sentinel1/data",
+    "products_30m/sentinel2/band_names",
+    "products_30m/sentinel2/valid",
+    "products_30m/sentinel2/labels",
+    "products_30m/sentinel2/data",
+    "products_30m/era5/band_names",
+    "products_30m/era5/data",
+    "products_30m/era5/labels",
+    "products_30m/era5/valid",
+    "meta/canonical_manifest_json"
+  ],
+  "attrs": {
+    "package_name": "Madurai complete multi-sensor dataset",
+    "created_utc": "2026-01-11T03:37:57.555235+00:00",
+    "roi_coords_lonlat": [
+      [
+        [
+          78.19018990852709,
+          9.878220339041174
+        ],
+        [
+          78.18528420047912,
+          9.882890316485547
+        ],
+        [
+          78.09810549679275,
+          9.894348798281609
+        ],
+        [
+          78.06157864432538,
+          9.932892703854442
+        ],
+        [
+          78.02656656110504,
+          9.94245002321148
+        ],
+        [
+          78.00260828167308,
+          9.965541799781803
+        ],
+        [
+          77.98788548795139,
+          9.97202781239784
+        ],
+        [
+          77.98759869039448,
+          9.972273355756196
+        ],
+        [
+          77.98926344201777,
+          9.974277652950137
+        ],
+        [
+          78.17034512986598,
+          10.09203200706642
+        ],
+        [
+          78.33409611393074,
+          10.299897884952559
+        ],
+        [
+          78.33446180425422,
+          10.301538866748283
+        ],
+        [
+          78.3424560260113,
+          10.300913203358672
+        ],
+        [
+          78.3620537189306,
+          10.301140183092196
+        ],
+        [
+          78.37500586343197,
+          10.310994022414183
+        ],
+        [
+          78.38801590170993,
+          10.315994815585963
+        ],
+        [
+          78.39017505117465,
+          10.315419769552259
+        ],
+        [
+          78.38542553295602,
+          10.314175493832316
+        ],
+        [
+          78.38810333700448,
+          10.269213359046619
+        ],
+        [
+          78.41273304358974,
+          10.212526305038399
+        ],
+        [
+          78.39622781746723,
+          10.177726046483423
+        ],
+        [
+          78.45775072031367,
+          10.100259541710393
+        ],
+        [
+          78.45817143938241,
+          9.967811808760526
+        ],
+        [
+          78.19018990852709,
+          9.878220339041174
+        ]
+      ]
+    ],
+    "date_start": "2015-01-01",
+    "date_end": "2026-01-11",
+    "notes": "Multi-grid Zarr. Each product keeps native grid. Missing/corrupt -> NaN + valid=0. Grid mismatches optionally warped to first valid.",
+    "build_summary": {
+      "landsat": {
+        "status": "ok",
+        "cadence": "daily",
+        "expected": 4029,
+        "found": 331,
+        "missing": 3698,
+        "corrupt": 0,
+        "grid_mismatch": 0,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          4029,
+          2,
+          1610,
+          1724
+        ],
+        "chunks": [
+          1,
+          2,
+          256,
+          256
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/madurai_landsat_scenes_local/20150106_1_LC08_143053_20150106_Madurai_LST_clear.tif",
+        "seconds": 38.82
+      },
+      "era5": {
+        "status": "ok",
+        "cadence": "daily",
+        "expected": 4029,
+        "found": 2912,
+        "missing": 1117,
+        "corrupt": 0,
+        "grid_mismatch": 0,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          4029,
+          8,
+          6,
+          6
+        ],
+        "chunks": [
+          1,
+          8,
+          6,
+          6
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/era5_daily/ERA5L_2018_01_01_Madurai.tif",
+        "seconds": 23.81
+      },
+      "modis": {
+        "status": "ok",
+        "cadence": "daily",
+        "expected": 4029,
+        "found": 2162,
+        "missing": 1867,
+        "corrupt": 5,
+        "grid_mismatch": 5,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          4029,
+          6,
+          50,
+          53
+        ],
+        "chunks": [
+          1,
+          6,
+          50,
+          53
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/modis/MODIS_2015_01_01_Madurai.tif",
+        "seconds": 82.8
+      },
+      "viirs": {
+        "status": "ok",
+        "cadence": "daily",
+        "expected": 4029,
+        "found": 3981,
+        "missing": 48,
+        "corrupt": 3201,
+        "grid_mismatch": 3201,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          4029,
+          4,
+          50,
+          53
+        ],
+        "chunks": [
+          1,
+          4,
+          50,
+          53
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/viirs/viirs_raw_2015_01_01_4band.tif",
+        "seconds": 138.74
+      },
+      "sentinel2": {
+        "status": "ok",
+        "cadence": "monthly",
+        "expected": 133,
+        "found": 123,
+        "missing": 10,
+        "corrupt": 0,
+        "grid_mismatch": 0,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          133,
+          17,
+          2438,
+          2621
+        ],
+        "chunks": [
+          1,
+          17,
+          256,
+          256
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/sentinel2/S2_PROC_2015_09_Madurai.tif",
+        "seconds": 214.47
+      },
+      "sentinel1": {
+        "status": "ok",
+        "cadence": "monthly",
+        "expected": 133,
+        "found": 128,
+        "missing": 5,
+        "corrupt": 2,
+        "grid_mismatch": 2,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          133,
+          6,
+          4875,
+          5240
+        ],
+        "chunks": [
+          1,
+          6,
+          256,
+          256
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/sentinel1/S1_2015_02_Madurai.tif",
+        "seconds": 227.15
+      },
+      "alphaearth": {
+        "status": "all_missing_or_corrupt",
+        "expected": 12,
+        "found": 0
+      },
+      "dem": {
+        "status": "ok",
+        "cadence": "static",
+        "expected": 1,
+        "found": 1,
+        "missing": 0,
+        "corrupt": 0,
+        "grid_mismatch": 0,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          1,
+          3,
+          1626,
+          1747
+        ],
+        "chunks": [
+          1,
+          3,
+          256,
+          256
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/static_data/dem/COPERNICUS_DEM_GLO30_Madurai_elev_slope_aspect_30m.tif",
+        "seconds": 0.13
+      },
+      "dynamic_world": {
+        "status": "ok",
+        "cadence": "static",
+        "expected": 1,
+        "found": 1,
+        "missing": 0,
+        "corrupt": 0,
+        "grid_mismatch": 0,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          1,
+          1,
+          4875,
+          5240
+        ],
+        "chunks": [
+          1,
+          1,
+          256,
+          256
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/static_data/dynamic_world/DynamicWorld_mode_2018-2025_Madurai_10m.tif",
+        "seconds": 0.51
+      },
+      "worldcover": {
+        "status": "ok",
+        "cadence": "static",
+        "expected": 1,
+        "found": 1,
+        "missing": 0,
+        "corrupt": 0,
+        "grid_mismatch": 0,
+        "warped": 0,
+        "warp_failed": 0,
+        "shape": [
+          1,
+          1,
+          4874,
+          5240
+        ],
+        "chunks": [
+          1,
+          1,
+          256,
+          256
+        ],
+        "reference_file": "/home/naren-root/Documents/FYP2/data/static_data/worldcover/WorldCover_2021_Madurai_10m.tif",
+        "seconds": 0.46
+      }
+    },
+    "canonical_grid": "landsat_30m",
+    "canonical_build_manifest": {
+      "input": "/home/naren-root/Documents/FYP2/Project/madurai.zarr",
+      "output": "/home/naren-root/Documents/FYP2/Project/madurai_30m_new.zarr",
+      "canonical_grid": "products/landsat",
+      "included_alphaearth": false,
+      "alphaearth_optimized": false,
+      "alphaearth_tile": 512,
+      "alphaearth_band_batch": 8,
+      "dtype": "float32",
+      "compress": {
+        "codec": "blosc",
+        "cname": "zstd",
+        "level": 9,
+        "shuffle": "bitshuffle"
+      },
+      "chunk_hw": 256,
+      "timestamp_utc": "2026-01-11T09:43:16"
+    }
+  },
+  "inferred_axes": {
+    "time": null,
+    "x": null,
+    "y": null
+  },
+  "resolution_estimate": {
+    "x_res": null,
+    "y_res": null,
+    "units": null,
+    "method": null
+  },
+  "nodata_used": null,
+  "sample_time_fraction": 1.0,
+  "sample_time_indices": null,
+  "variables": {
+    "time/daily": {
+      "dims": [],
+      "shape": [
+        4029
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        4029
+      ],
+      "zarr_chunks": [
+        4029
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "time/monthly": {
+      "dims": [],
+      "shape": [
+        133
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        133
+      ],
+      "zarr_chunks": [
+        133
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "time/annual": {
+      "dims": [],
+      "shape": [
+        12
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        12
+      ],
+      "zarr_chunks": [
+        12
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "static_30m/worldcover/labels": {
+      "dims": [],
+      "shape": [
+        1
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        1
+      ],
+      "zarr_chunks": [
+        1
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "static_30m/worldcover/band_names": {
+      "dims": [],
+      "shape": [
+        1
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        1
+      ],
+      "zarr_chunks": [
+        1
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "static_30m/worldcover/data": {
+      "dims": [],
+      "shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "float32",
+      "attrs": {},
+      "zarr_shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "float32",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=4, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 90.0,
+        "mean": 13.503902906031398,
+        "std": 17.206360043635446,
+        "count_total": 2775640,
+        "count_missing": 11802,
+        "missing_fraction": 0.004251992333299708,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 10.0,
+          "p95": 40.0,
+          "p99": 40.0
+        },
+        "percentiles_note": "approx_from_samples"
+      }
+    },
+    "static_30m/worldcover/valid": {
+      "dims": [],
+      "shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "uint8",
+      "attrs": {},
+      "zarr_shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "uint8",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=1, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.9957480076667002,
+        "std": 0.06506852460673493,
+        "count_total": 2775640,
+        "count_missing": 0,
+        "missing_fraction": 0.0,
+        "percentiles": {
+          "p1": 1.0,
+          "p5": 1.0,
+          "p25": 1.0,
+          "p50": 1.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "p99": 1.0
+        },
+        "percentiles_note": "approx_from_samples"
+      }
+    },
+    "static_30m/dem/valid": {
+      "dims": [],
+      "shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "uint8",
+      "attrs": {},
+      "zarr_shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "uint8",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=1, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.5046075859981842,
+        "std": 0.4999787697005437,
+        "count_total": 2775640,
+        "count_missing": 0,
+        "missing_fraction": 0.0,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "p99": 1.0
+        },
+        "percentiles_note": "approx_from_samples"
+      }
+    },
+    "static_30m/dem/labels": {
+      "dims": [],
+      "shape": [
+        1
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        1
+      ],
+      "zarr_chunks": [
+        1
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "static_30m/dem/data": {
+      "dims": [],
+      "shape": [
+        1,
+        3,
+        1610,
+        1724
+      ],
+      "dtype": "float32",
+      "attrs": {},
+      "zarr_shape": [
+        1,
+        3,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        3,
+        256,
+        256
+      ],
+      "zarr_dtype": "float32",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=4, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 822.2467041015625,
+        "mean": 103.62837228175498,
+        "std": 89.55908984927089,
+        "count_total": 8326920,
+        "count_missing": 4125093,
+        "missing_fraction": 0.4953924140018158,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p50": 136.0,
+          "p75": 151.17584228515625,
+          "p95": 274.6888595581051,
+          "p99": 454.9271603393568
+        },
+        "percentiles_note": "approx_from_samples"
+      }
+    },
+    "static_30m/dem/band_names": {
+      "dims": [],
+      "shape": [
+        3
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        3
+      ],
+      "zarr_chunks": [
+        3
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "static_30m/dynamic_world/valid": {
+      "dims": [],
+      "shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "uint8",
+      "attrs": {},
+      "zarr_shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "uint8",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=1, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.9958319522704672,
+        "std": 0.0644257332721715,
+        "count_total": 2775640,
+        "count_missing": 0,
+        "missing_fraction": 0.0,
+        "percentiles": {
+          "p1": 1.0,
+          "p5": 1.0,
+          "p25": 1.0,
+          "p50": 1.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "p99": 1.0
+        },
+        "percentiles_note": "approx_from_samples"
+      }
+    },
+    "static_30m/dynamic_world/band_names": {
+      "dims": [],
+      "shape": [
+        1
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        1
+      ],
+      "zarr_chunks": [
+        1
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "static_30m/dynamic_world/data": {
+      "dims": [],
+      "shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "float32",
+      "attrs": {},
+      "zarr_shape": [
+        1,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "float32",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=4, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 7.0,
+        "mean": 1.756811239653396,
+        "std": 2.2415168083109944,
+        "count_total": 2775640,
+        "count_missing": 11569,
+        "missing_fraction": 0.004168047729532648,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 1.0,
+          "p95": 5.0,
+          "p99": 6.0
+        },
+        "percentiles_note": "approx_from_samples"
+      }
+    },
+    "static_30m/dynamic_world/labels": {
+      "dims": [],
+      "shape": [
+        1
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        1
+      ],
+      "zarr_chunks": [
+        1
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "labels_30m/landsat/labels": {
+      "dims": [],
+      "shape": [
+        4029
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        4029
+      ],
+      "zarr_chunks": [
+        4029
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "labels_30m/landsat/band_names": {
+      "dims": [],
+      "shape": [
+        2
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        2
+      ],
+      "zarr_chunks": [
+        2
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "labels_30m/landsat/valid": {
+      "dims": [],
+      "shape": [
+        4029,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "uint8",
+      "attrs": {},
+      "zarr_shape": [
+        4029,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "uint8",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=1, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.07307291768184875,
+        "std": 0.2602561553226176,
+        "count_total": 11492192,
+        "count_missing": 0,
+        "missing_fraction": 0.0,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 0.0,
+          "p95": 0.04999999998835847,
+          "p99": 1.0
+        },
+        "percentiles_note": "approx_from_samples",
+        "sample_note": "sampled_chunks"
+      }
+    },
+    "labels_30m/landsat/data": {
+      "dims": [],
+      "shape": [
+        4029,
+        2,
+        1610,
+        1724
+      ],
+      "dtype": "float32",
+      "attrs": {},
+      "zarr_shape": [
+        4029,
+        2,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        2,
+        256,
+        256
+      ],
+      "zarr_dtype": "float32",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=4, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 329.9944152832031,
+        "mean": 115.53307002436848,
+        "std": 128.80695929496918,
+        "count_total": 22984384,
+        "count_missing": 21304848,
+        "missing_fraction": 0.9269270823181514,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 1.0,
+          "p50": 149.0,
+          "p75": 302.8348388671875,
+          "p95": 316.45562744140625,
+          "p99": 323.4557836914063
+        },
+        "percentiles_note": "approx_from_samples",
+        "sample_note": "sampled_chunks"
+      }
+    },
+    "products_30m/sentinel1/valid": {
+      "dims": [],
+      "shape": [
+        133,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "uint8",
+      "attrs": {},
+      "zarr_shape": [
+        133,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "uint8",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=1, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.46077635414269985,
+        "std": 0.49845913132940084,
+        "count_total": 10917904,
+        "count_missing": 0,
+        "missing_fraction": 0.0,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "p99": 1.0
+        },
+        "percentiles_note": "approx_from_samples",
+        "sample_note": "sampled_chunks"
+      }
+    },
+    "products_30m/sentinel1/labels": {
+      "dims": [],
+      "shape": [
+        133
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        133
+      ],
+      "zarr_chunks": [
+        133
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "products_30m/sentinel1/band_names": {
+      "dims": [],
+      "shape": [
+        6
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        6
+      ],
+      "zarr_chunks": [
+        6
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "products_30m/sentinel1/data": {
+      "dims": [],
+      "shape": [
+        133,
+        6,
+        1610,
+        1724
+      ],
+      "dtype": "float32",
+      "attrs": {},
+      "zarr_shape": [
+        133,
+        6,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        6,
+        256,
+        256
+      ],
+      "zarr_dtype": "float32",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=4, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": -60.0,
+        "max": 17806814.0,
+        "mean": 3296.7996820435856,
+        "std": 96851.28027117196,
+        "count_total": 50164272,
+        "count_missing": 26721558,
+        "missing_fraction": 0.5326810683109285,
+        "percentiles": {
+          "p1": -60.0,
+          "p5": -60.0,
+          "p25": -60.0,
+          "p50": -13.658379554748535,
+          "p75": 0.0,
+          "p95": 1.0,
+          "p99": 14.722780609131377
+        },
+        "percentiles_note": "approx_from_samples",
+        "sample_note": "sampled_chunks_max_elements"
+      }
+    },
+    "products_30m/sentinel2/band_names": {
+      "dims": [],
+      "shape": [
+        17
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        17
+      ],
+      "zarr_chunks": [
+        17
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "products_30m/sentinel2/valid": {
+      "dims": [],
+      "shape": [
+        133,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "uint8",
+      "attrs": {},
+      "zarr_shape": [
+        133,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "uint8",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=1, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.4429818214192031,
+        "std": 0.4967382885497435,
+        "count_total": 10917904,
+        "count_missing": 0,
+        "missing_fraction": 0.0,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "p99": 1.0
+        },
+        "percentiles_note": "approx_from_samples",
+        "sample_note": "sampled_chunks"
+      }
+    },
+    "products_30m/sentinel2/labels": {
+      "dims": [],
+      "shape": [
+        133
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        133
+      ],
+      "zarr_chunks": [
+        133
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "products_30m/sentinel2/data": {
+      "dims": [],
+      "shape": [
+        133,
+        17,
+        1610,
+        1724
+      ],
+      "dtype": "float32",
+      "attrs": {},
+      "zarr_shape": [
+        133,
+        17,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        17,
+        256,
+        256
+      ],
+      "zarr_dtype": "float32",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=4, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": -129599.9453125,
+        "max": 3099144.25,
+        "mean": 1.4861871763699799,
+        "std": 1025.8649018032,
+        "count_total": 50050992,
+        "count_missing": 34078901,
+        "missing_fraction": 0.6808836276411864,
+        "percentiles": {
+          "p1": -0.4826616898179054,
+          "p5": -0.3434179320931435,
+          "p25": 0.0,
+          "p50": 0.24545633047819138,
+          "p75": 1.0,
+          "p95": 6.0,
+          "p99": 12.0
+        },
+        "percentiles_note": "approx_from_samples",
+        "sample_note": "sampled_chunks_max_elements"
+      }
+    },
+    "products_30m/era5/band_names": {
+      "dims": [],
+      "shape": [
+        8
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        8
+      ],
+      "zarr_chunks": [
+        8
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "products_30m/era5/data": {
+      "dims": [],
+      "shape": [
+        4029,
+        8,
+        1610,
+        1724
+      ],
+      "dtype": "float32",
+      "attrs": {},
+      "zarr_shape": [
+        4029,
+        8,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        8,
+        256,
+        256
+      ],
+      "zarr_dtype": "float32",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=4, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 482760480.0,
+        "mean": 98199223.18559973,
+        "std": 175070177.47002786,
+        "count_total": 50473024,
+        "count_missing": 18469280,
+        "missing_fraction": 0.36592378534719855,
+        "percentiles": {
+          "p1": 0.020620226860046387,
+          "p5": 1.095641326904297,
+          "p25": 25.264934062957764,
+          "p50": 60.95806884765625,
+          "p75": 190839240.0,
+          "p95": 461096288.0,
+          "p99": 469924133.76
+        },
+        "percentiles_note": "approx_from_samples",
+        "sample_note": "sampled_chunks_max_elements"
+      }
+    },
+    "products_30m/era5/labels": {
+      "dims": [],
+      "shape": [
+        4029
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        4029
+      ],
+      "zarr_chunks": [
+        4029
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    },
+    "products_30m/era5/valid": {
+      "dims": [],
+      "shape": [
+        4029,
+        1,
+        1610,
+        1724
+      ],
+      "dtype": "uint8",
+      "attrs": {},
+      "zarr_shape": [
+        4029,
+        1,
+        1610,
+        1724
+      ],
+      "zarr_chunks": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "zarr_dtype": "uint8",
+      "zarr_compressor": "(BloscCodec(_tunable_attrs=set(), typesize=1, cname=<BloscCname.zstd: 'zstd'>, clevel=9, shuffle=<BloscShuffle.bitshuffle: 'bitshuffle'>, blocksize=0),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.577646022621272,
+        "std": 0.4939343024847504,
+        "count_total": 11492192,
+        "count_missing": 0,
+        "missing_fraction": 0.0,
+        "percentiles": {
+          "p1": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "p99": 1.0
+        },
+        "percentiles_note": "approx_from_samples",
+        "sample_note": "sampled_chunks"
+      }
+    },
+    "meta/canonical_manifest_json": {
+      "dims": [],
+      "shape": [
+        1
+      ],
+      "dtype": "StringDType()",
+      "attrs": {},
+      "zarr_shape": [
+        1
+      ],
+      "zarr_chunks": [
+        1
+      ],
+      "zarr_dtype": "StringDType()",
+      "zarr_compressor": "(ZstdCodec(level=0, checksum=False),)",
+      "zarr_filters": "()",
+      "zarr_order": "C",
+      "stats": {
+        "note": "non-numeric; stats skipped"
+      }
+    }
+  }
+}
