@@ -175,8 +175,9 @@ class UNetBlock(nn.Module):
 
 
 class ResidualUNet(nn.Module):
-    def __init__(self, in_ch: int, channels: Sequence[int]):
+    def __init__(self, in_ch: int, channels: Sequence[int], use_checkpoint: bool = False):
         super().__init__()
+        self.use_checkpoint = use_checkpoint
         c1, c2, c3, c4 = channels
         self.enc1 = UNetBlock(in_ch, c1)
         self.down1 = nn.Conv2d(c1, c2, kernel_size=3, stride=2, padding=1, bias=False)
@@ -193,23 +194,29 @@ class ResidualUNet(nn.Module):
         self.up1 = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False)
         self.dec1 = UNetBlock(c2 + c1, c1)
 
+    def _cp(self, module: nn.Module, x: torch.Tensor) -> torch.Tensor:
+        if not self.use_checkpoint:
+            return module(x)
+        from torch.utils.checkpoint import checkpoint
+        return checkpoint(module, x)
+
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-        e1 = self.enc1(x)
-        e2 = self.enc2(self.down1(e1))
-        e3 = self.enc3(self.down2(e2))
-        e4 = self.enc4(self.down3(e3))
+        e1 = self._cp(self.enc1, x)
+        e2 = self._cp(self.enc2, self.down1(e1))
+        e3 = self._cp(self.enc3, self.down2(e2))
+        e4 = self._cp(self.enc4, self.down3(e3))
         up3 = self.up3(e4)
         if up3.shape[-2:] != e3.shape[-2:]:
             e3 = F.interpolate(e3, size=up3.shape[-2:], mode="bilinear", align_corners=False)
-        d3 = self.dec3(torch.cat([up3, e3], dim=1))
+        d3 = self._cp(self.dec3, torch.cat([up3, e3], dim=1))
         up2 = self.up2(d3)
         if up2.shape[-2:] != e2.shape[-2:]:
             e2 = F.interpolate(e2, size=up2.shape[-2:], mode="bilinear", align_corners=False)
-        d2 = self.dec2(torch.cat([up2, e2], dim=1))
+        d2 = self._cp(self.dec2, torch.cat([up2, e2], dim=1))
         up1 = self.up1(d2)
         if up1.shape[-2:] != e1.shape[-2:]:
             e1 = F.interpolate(e1, size=up1.shape[-2:], mode="bilinear", align_corners=False)
-        d1 = self.dec1(torch.cat([up1, e1], dim=1))
+        d1 = self._cp(self.dec1, torch.cat([up1, e1], dim=1))
         return d1, d2, d3, e4
 
 
@@ -229,6 +236,8 @@ class ResidualNet(nn.Module):
         s1_out: int = 12,
         dem_out: int = 12,
         head_dropout: float = 0.1,
+        head_ch: int = 32,
+        use_checkpoint: bool = False,
     ):
         super().__init__()
         self.s2_adapter = AdapterS2(s2_ch, out_ch=s2_out)
@@ -244,18 +253,18 @@ class ResidualNet(nn.Module):
         if self.s1_adapter:
             in_ch += s1_out
 
-        self.trunk = ResidualUNet(in_ch, unet_channels)
+        self.trunk = ResidualUNet(in_ch, unet_channels, use_checkpoint=use_checkpoint)
         self.film1 = FiLM(base_ch + era5_ch, unet_channels[0])
         self.film2 = FiLM(base_ch + era5_ch, unet_channels[1])
         self.film3 = FiLM(base_ch + era5_ch, unet_channels[2])
         self.film4 = FiLM(base_ch + era5_ch, unet_channels[3])
 
         self.head = nn.Sequential(
-            nn.Conv2d(unet_channels[0], 32, kernel_size=3, padding=1, bias=False),
-            nn.GroupNorm(_gn_groups(32), 32),
+            nn.Conv2d(unet_channels[0], head_ch, kernel_size=3, padding=1, bias=False),
+            nn.GroupNorm(_gn_groups(head_ch), head_ch),
             nn.SiLU(),
             nn.Dropout2d(p=head_dropout),
-            nn.Conv2d(32, 1, kernel_size=1, bias=True),
+            nn.Conv2d(head_ch, 1, kernel_size=1, bias=True),
         )
         self.residual_tanh = residual_tanh
 

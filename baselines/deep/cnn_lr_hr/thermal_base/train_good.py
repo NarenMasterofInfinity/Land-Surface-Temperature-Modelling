@@ -440,6 +440,12 @@ def main():
     ap.add_argument("--min-s2-valid", type=float, default=0.10)
     ap.add_argument("--wd-res", type=float, default=5e-4)
     ap.add_argument("--res-dropout", type=float, default=0.1)
+    ap.add_argument("--res-head-ch", type=int, default=16)
+    ap.add_argument("--res-checkpoint", action="store_true")
+    ap.add_argument("--res-unet", type=str, default="8,16,24,32")
+    ap.add_argument("--res-s2-out", type=int, default=16)
+    ap.add_argument("--res-dem-out", type=int, default=8)
+    ap.add_argument("--res-ckpt", type=str, default="")
     ap.add_argument("--lr-base", type=float, default=3e-4)
     ap.add_argument("--lr-res", type=float, default=3e-4)
     ap.add_argument("--era5-idx", type=str, default="0,1,3,4")
@@ -650,6 +656,11 @@ def main():
     s1_ch = None
     if args.res_downsample != 1:
         raise RuntimeError("res_downsample must be 1 (no res downsampling allowed).")
+    if args.residual_only and args.res_ckpt:
+        args.res_checkpoint = True
+    unet_channels = tuple(int(x) for x in args.res_unet.split(",") if x.strip())
+    if len(unet_channels) != 4:
+        raise RuntimeError("--res-unet must have 4 comma-separated ints, e.g. 8,16,24,32")
     res_net = ResidualNet(
         s2_ch=s2_ch,
         s1_ch=s1_ch,
@@ -658,12 +669,26 @@ def main():
         lc_one_hot=False,
         era5_ch=len(era5_idx),
         base_ch=1,
-        unet_channels=(8, 16, 24, 32),
-        s2_out=16,
+        unet_channels=unet_channels,
+        s2_out=args.res_s2_out,
         s1_out=8,
-        dem_out=8,
+        dem_out=args.res_dem_out,
         head_dropout=args.res_dropout,
+        head_ch=args.res_head_ch,
+        use_checkpoint=args.res_checkpoint,
     ).to(res_device)
+    if args.res_ckpt:
+        if not Path(args.res_ckpt).exists():
+            raise RuntimeError(f"res checkpoint not found: {args.res_ckpt}")
+        res_net.load_state_dict(torch.load(args.res_ckpt, map_location=res_device))
+        print(f"loaded res ckpt: {args.res_ckpt}")
+    if args.res_ckpt:
+        ckpt_path = args.res_ckpt
+        if not Path(ckpt_path).exists():
+            raise RuntimeError(f"res checkpoint not found: {ckpt_path}")
+        res_state = torch.load(ckpt_path, map_location=res_device)
+        res_net.load_state_dict(res_state)
+        print(f"loaded res ckpt: {ckpt_path}")
     train_res = ResidualFullScene(train_idx, root_30m, root_daily, args.lst_min, args.lst_max, era5_idx)
     val_res = ResidualFullScene(val_idx, root_30m, root_daily, args.lst_min, args.lst_max, era5_idx)
     train_loader_r = DataLoader(train_res, batch_size=args.batch_size, shuffle=True, collate_fn=_stack_residual)
@@ -818,6 +843,8 @@ def main():
                         print(f"early stop residual at epoch {epoch}")
                         break
 
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
     _run_phase(args.residual_r0, lr_peak=args.lr_res, lr_end=2e-6, warmup_start=1e-5)
 
 
