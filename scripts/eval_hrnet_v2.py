@@ -28,6 +28,8 @@ _ap.add_argument("--out-csv", default=None)
 _ap.add_argument("--stats-samples", type=int, default=200)
 _ap.add_argument("--splits-csv", default=None, help="Optional date splits CSV (defaults to run date_splits.csv)")
 _ap.add_argument("--out-dir", default=None, help="Output folder for figures/metrics")
+_ap.add_argument("--single-date", default=None, help="YYYY-MM-DD date to run a single prediction")
+_ap.add_argument("--out-npy", default=None, help="Output .npy path for single-date prediction")
 _args = _ap.parse_args()
 
 RUN_TAG = _args.run_name
@@ -396,6 +398,38 @@ def main():
                 sigma_x[ch] = float(np.sqrt(var)) if var > 0 else 1.0
     mu_x = np.asarray(mu_x, dtype=np.float32)
     sigma_x = np.asarray(sigma_x, dtype=np.float32)
+
+    if _args.single_date:
+        target_date = pd.to_datetime(_args.single_date, errors="coerce")
+        if pd.isna(target_date):
+            raise SystemExit(f"invalid --single-date: {_args.single_date}")
+        daily_norm = pd.DatetimeIndex(daily_times).normalize()
+        match = np.where(daily_norm == target_date.normalize())[0]
+        if match.size == 0:
+            raise SystemExit(f"date not found in daily_times: {target_date.date()}")
+        t = int(match[0])
+        y_pred = np.full((H_hr, W_hr), np.nan, dtype=np.float32)
+        ys = _tile_starts(H_hr, PATCH_SIZE)
+        xs = _tile_starts(W_hr, PATCH_SIZE)
+
+        for y0 in ys:
+            for x0 in xs:
+                comp = ds.get_components_at(t, y0, x0)
+                x_raw = build_input_stack(comp, INPUT_KEYS)
+                xb = torch.from_numpy(x_raw).float().unsqueeze(0).to(device)
+                xb = ensure_nchw(xb, in_ch=in_ch)
+                if not torch.isfinite(xb).all():
+                    xb = fill_nan_nearest(xb)
+                xb = normalize_batch_global(xb, mu_x, sigma_x, mask_idx)
+                with torch.no_grad():
+                    pred = model(xb).squeeze(0).squeeze(0).cpu().numpy()
+                pred = pred * (sigma_y + EPS_Y) + mu_y
+                y_pred[y0 : y0 + PATCH_SIZE, x0 : x0 + PATCH_SIZE] = pred
+
+        out_npy = Path(_args.out_npy) if _args.out_npy else (OUT_DIR / f"hrnet_pred_{target_date.date()}.npy")
+        np.save(out_npy, y_pred)
+        print(f"saved {out_npy} shape={y_pred.shape}")
+        return
 
     splits_path = Path(_args.splits_csv) if _args.splits_csv else (PROJECT_ROOT / "metrics" / "deep_baselines" / "cnn_lr_hr" / RUN_TAG / f"{RUN_TAG}_date_splits.csv")
     if not splits_path.exists():

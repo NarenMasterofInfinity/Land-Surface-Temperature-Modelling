@@ -1,0 +1,62 @@
+[static/dem]
+  crs: EPSG:4326
+  transform: [0.00026949458523585647, 0.0, 77.98742105389309, 0.0, -0.00026949458523585647, 10.316252722828585, 0.0, 0.0, 1.0]
+  width,height: 1747,1626
+  pixel_size_x,y: 0.00026949458523585647,0.00026949458523585647
+  reference_file: /home/naren-root/Documents/FYP2/data/static_data/dem/COPERNICUS_DEM_GLO30_Madurai_elev_slope_aspect_30m.tif
+
+[static/worldcover]
+  crs: EPSG:4326
+  transform: [8.983152841195215e-05, 0.0, 77.98752577239901, 0.0, -8.983152841195215e-05, 10.316048146209894, 0.0, 0.0, 1.0]
+  width,height: 5240,4874
+  pixel_size_x,y: 8.983152841195215e-05,8.983152841195215e-05
+  reference_file: /home/naren-root/Documents/FYP2/data/static_data/worldcover/WorldCover_2021_Madurai_10m.tif
+
+[static/dynamic_world]
+  crs: EPSG:4326
+  transform: [8.983152841195215e-05, 0.0, 77.9875108854215, 0.0, -8.983152841195215e-05, 10.31607305977176, 0.0, 0.0, 1.0]
+  width,height: 5240,4875
+  pixel_size_x,y: 8.983152841195215e-05,8.983152841195215e-05
+  reference_file: /home/naren-root/Documents/FYP2/data/static_data/dynamic_world/DynamicWorld_mode_2018-2025_Madurai_10m.tif
+
+[products/modis]
+  crs: PROJCS["MODIS Sinusoidal",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Sinusoidal"],PARAMETER["longitude_of_center",0],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]
+  transform: [999.9999999995498, 0.0, 8539890.644190144, 0.0, -1000.00000000045, 1147554.6778990142, 0.0, 0.0, 1.0]
+  width,height: 53,50
+  pixel_size_x,y: 999.9999999995498,1000.00000000045
+  reference_file: /home/naren-root/Documents/FYP2/data/modis/MODIS_2015_01_01_Madurai.tif
+
+[products/landsat]
+  crs: EPSG:32644
+  transform: [30.0, 0.0, 169665.0, 0.0, -30.0, 1141545.0, 0.0, 0.0, 1.0]
+  width,height: 1724,1610
+  pixel_size_x,y: 30.0,30.0
+  reference_file: /home/naren-root/Documents/FYP2/data/madurai_landsat_scenes_local/20150106_1_LC08_143053_20150106_Madurai_LST_clear.tif
+
+[products/era5]
+  crs: EPSG:4326
+  transform: [0.08983152841195215, 0.0, 77.97376666157446, 0.0, -0.08983152841195215, 10.330625767374498, 0.0, 0.0, 1.0]
+  width,height: 6,6
+  pixel_size_x,y: 0.08983152841195215,0.08983152841195215
+  reference_file: /home/naren-root/Documents/FYP2/data/era5_daily/ERA5L_2018_01_01_Madurai.tif
+
+[products/sentinel1]
+  crs: EPSG:4326
+  transform: [8.983152841195215e-05, 0.0, 77.9875108854215, 0.0, -8.983152841195215e-05, 10.31607305977176, 0.0, 0.0, 1.0]
+  width,height: 5240,4875
+  pixel_size_x,y: 8.983152841195215e-05,8.983152841195215e-05
+  reference_file: /home/naren-root/Documents/FYP2/data/sentinel1/S1_2015_02_Madurai.tif
+
+[products/viirs]
+  crs: PROJCS["MODIS Sinusoidal",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Sinusoidal"],PARAMETER["longitude_of_center",0],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]
+  transform: [999.9999999999999, 0.0, 8539890.645999998, 0.0, -999.9999999999999, 1147604.1573330006, 0.0, 0.0, 1.0]
+  width,height: 53,50
+  pixel_size_x,y: 999.9999999999999,999.9999999999999
+  reference_file: /home/naren-root/Documents/FYP2/data/viirs/viirs_raw_2015_01_01_4band.tif
+
+[products/sentinel2]
+  crs: EPSG:4326
+  transform: [0.0001796630568239043, 0.0, 77.98742105389309, 0.0, -0.0001796630568239043, 10.31607305977176, 0.0, 0.0, 1.0]
+  width,height: 2621,2438
+  pixel_size_x,y: 0.0001796630568239043,0.0001796630568239043
+  reference_file: /home/naren-root/Documents/FYP2/data/sentinel2/S2_PROC_2015_09_Madurai.tif

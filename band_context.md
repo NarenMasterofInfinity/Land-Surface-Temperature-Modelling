@@ -116,8 +116,7 @@ NDWI_water
 - Detects open water bodies
 - LST relevance:
   Very low surface temperature zones
-
-NDWI_moisture
+9 NDWI_moisture
 - Sensitive to vegetation moisture
 - LST relevance:
   Moist vegetation → reduced LST
@@ -231,7 +230,7 @@ static_30m/dem/band_03
 ====================================================
 
 static_30m/worldcover/band_01
-- ESA WorldCover class label
+- ESA WorldCover class labelhttps://chatgpt.com/g/g-p-693a34fcf4388191b8805013aaf869c3/c/6988dc5a-7468-83aa-89de-5dde4a58396b
 - Nature: Categorical
 - LST relevance:
   Extremely strong semantic cue

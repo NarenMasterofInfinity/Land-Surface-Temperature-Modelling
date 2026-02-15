@@ -1,0 +1,8 @@
+[client]
+showErrorDetails = true
+
+[server]
+runOnSave = true
+
+[logger]
+level = "info"

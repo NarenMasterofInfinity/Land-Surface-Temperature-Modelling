@@ -1,4 +1,5 @@
 import re
+import math
 from datetime import date as Date
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -309,7 +310,7 @@ def _plot_heatmap(arr: np.ndarray, cmap_name: str, title: str) -> None:
     ax.set_title(title)
     ax.axis("off")
     fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(fig, width="stretch")
     plt.close(fig)
 
 
@@ -844,6 +845,253 @@ def _discover_cnn_lr_hr_models() -> Dict[str, Dict[str, str]]:
     return specs
 
 
+def _label_cnn_lr_hr_run(run_name: str) -> Optional[str]:
+    lname = run_name.lower()
+    if "hr_lr" in lname or "cnn_hr_lr" in lname:
+        return None
+    if lname == "cnn_lr_hr":
+        return "cnn model"
+    if lname.startswith("cnn_lr_hr_"):
+        return lname.replace("cnn_lr_hr_", "")
+    return run_name
+
+
+def _find_fusion_pred(date_str: str, method: str, source: str) -> Optional[Path]:
+    base = ROOT / "metrics" / "fusion_baselines"
+    if method == "starfm":
+        if source == "modis":
+            cand = base / "starfm" / "modis" / f"starfm_pred_{date_str}.npy"
+            return cand if cand.exists() else None
+        if source == "viirs":
+            cand = base / "starfm" / "viirs" / f"starfm_pred_{date_str}.npy"
+            return cand if cand.exists() else None
+        cand = base / "starfm" / f"starfm_pred_{date_str}.npy"
+        return cand if cand.exists() else None
+    if method == "ustarfm":
+        if source == "modis":
+            cand = base / "ustarfm_modis" / f"ustarfm_pred_{date_str}.npy"
+            return cand if cand.exists() else None
+        if source == "viirs":
+            cand = base / "ustarfm_viirs" / f"ustarfm_pred_{date_str}.npy"
+            return cand if cand.exists() else None
+    if method == "fsdaf":
+        if source == "modis":
+            cand = base / "fsdaf" / "modis" / f"fsdaf_pred_{date_str}.npy"
+            return cand if cand.exists() else None
+        if source == "viirs":
+            cand = base / "fsdaf" / "viirs" / f"fsdaf_pred_{date_str}.npy"
+            return cand if cand.exists() else None
+    return None
+
+
+def _load_starfm_module():
+    import importlib.util
+
+    path = ROOT / "baselines" / "fusion" / "starfm.py"
+    spec = importlib.util.spec_from_file_location("starfm", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load baselines/fusion/starfm.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _load_ustarfm_module():
+    import importlib.util
+
+    path = ROOT / "baselines" / "fusion" / "ustarfm.py"
+    spec = importlib.util.spec_from_file_location("ustarfm", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load baselines/fusion/ustarfm.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _load_fsdaf_module():
+    import importlib.util
+
+    path = ROOT / "baselines" / "fusion" / "fsdaf.py"
+    spec = importlib.util.spec_from_file_location("fsdaf", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load baselines/fusion/fsdaf.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _lowres_available(source: str, modis_files: str, viirs_files: str) -> bool:
+    if source == "modis":
+        return bool(str(modis_files or "").strip())
+    if source == "viirs":
+        return bool(str(viirs_files or "").strip())
+    return False
+
+
+def _select_base_idx(
+    allowed_t: Iterable[int],
+    target_idx: int,
+    landsat_group: zarr.Array,
+    lowres_group: zarr.Array,
+    source: str,
+    mod,
+) -> Tuple[int, np.ndarray, np.ndarray]:
+    candidates = [int(t) for t in allowed_t if int(t) <= int(target_idx)]
+    if not candidates:
+        candidates = [int(t) for t in allowed_t]
+    candidates = sorted(set(candidates), reverse=True)
+    for t in candidates:
+        y0 = mod._extract_landsat(landsat_group[int(t), 0])
+        if not mod._has_valid(y0):
+            continue
+        if source == "modis":
+            c0 = mod._extract_modis(lowres_group[int(t)])
+        else:
+            c0 = mod._extract_viirs(lowres_group[int(t)])
+        if not mod._has_valid(c0):
+            continue
+        return int(t), y0, c0
+    raise RuntimeError("No base date with valid Landsat and low-res data found.")
+
+
+def _starfm_predict_with_progress(
+    mod,
+    F_tb: np.ndarray,
+    C_tb_lr: np.ndarray,
+    C_t_lr: np.ndarray,
+    row_float: np.ndarray,
+    col_float: np.ndarray,
+    y_slices: list,
+    x_slices: list,
+    r_lr: int,
+    sigma_d: float,
+    sigma_f: float,
+    sigma_c: float,
+    sigma_t: float,
+    min_weight_sum: float,
+    progress: Optional[st.delta_generator.DeltaGenerator],
+) -> np.ndarray:
+    H, W = F_tb.shape
+    h, w = C_tb_lr.shape
+    C_tb_hr = mod._bilinear_full(C_tb_lr, row_float, col_float)
+    C_t_hr = mod._bilinear_full(C_t_lr, row_float, col_float)
+    F_hat = np.full((H, W), np.nan, dtype=np.float32)
+
+    for i in range(h):
+        if progress is not None and h > 1:
+            progress.progress(min(0.99, i / (h - 1)))
+        ysl = y_slices[i]
+        if ysl.stop <= ysl.start:
+            continue
+        for j in range(w):
+            xsl = x_slices[j]
+            if xsl.stop <= xsl.start:
+                continue
+
+            F_block = F_tb[ysl, xsl]
+            if np.all(np.isnan(F_block)):
+                continue
+            Bh, Bw = F_block.shape
+
+            Ctb_block = C_tb_hr[ysl, xsl]
+            Ct_block = C_t_hr[ysl, xsl]
+
+            i0 = max(0, i - r_lr)
+            i1 = min(h - 1, i + r_lr)
+            j0 = max(0, j - r_lr)
+            j1 = min(w - 1, j + r_lr)
+
+            candidates_F = []
+            candidates_Ctb = []
+            candidates_Ct = []
+            candidates_dist = []
+
+            for ni in range(i0, i1 + 1):
+                ysl2 = y_slices[ni]
+                if ysl2.stop <= ysl2.start:
+                    continue
+                for nj in range(j0, j1 + 1):
+                    xsl2 = x_slices[nj]
+                    if xsl2.stop <= xsl2.start:
+                        continue
+                    Fb2 = F_tb[ysl2, xsl2]
+                    if np.all(np.isnan(Fb2)):
+                        continue
+                    Ctb2 = C_tb_hr[ysl2, xsl2]
+                    Ct2 = C_t_hr[ysl2, xsl2]
+                    Fb2 = mod._resize_bilinear_block(Fb2, Bh, Bw)
+                    Ctb2 = mod._resize_bilinear_block(Ctb2, Bh, Bw)
+                    Ct2 = mod._resize_bilinear_block(Ct2, Bh, Bw)
+                    d = math.sqrt((ni - i) ** 2 + (nj - j) ** 2)
+                    candidates_F.append(Fb2)
+                    candidates_Ctb.append(Ctb2)
+                    candidates_Ct.append(Ct2)
+                    candidates_dist.append(d)
+
+            if len(candidates_F) == 0:
+                continue
+
+            cand_F = np.stack(candidates_F, axis=0)
+            cand_Ctb = np.stack(candidates_Ctb, axis=0)
+            cand_Ct = np.stack(candidates_Ct, axis=0)
+            cand_d = np.array(candidates_dist, dtype=np.float32)[:, None, None]
+
+            cand_val = cand_F + (cand_Ct - cand_Ctb)
+
+            w_d = np.exp(-cand_d / max(sigma_d, 1e-6))
+            F_ref = mod.safe_nanmean(F_block)
+            w_f = np.exp(-np.abs(cand_F - F_ref) / max(sigma_f, 1e-6))
+            C_ref = mod.safe_nanmean(Ctb_block)
+            w_c = np.exp(-np.abs(cand_Ctb - C_ref) / max(sigma_c, 1e-6))
+            w_t = np.exp(-np.abs(cand_Ct - cand_Ctb) / max(sigma_t, 1e-6))
+
+            w_all = w_d * w_f * w_c * w_t
+            w_all = np.where(np.isnan(cand_val), 0.0, w_all)
+            w_sum = np.sum(w_all, axis=0)
+            num = np.sum(w_all * cand_val, axis=0)
+            pred_block = np.where(w_sum > min_weight_sum, num / w_sum, np.nan).astype(np.float32)
+            F_hat[ysl, xsl] = pred_block
+
+    if progress is not None:
+        progress.progress(1.0)
+    return F_hat
+
+
+@st.cache_resource(show_spinner=False)
+def _ustarfm_class_map(root_30m_path: str, n_classes: int, sample_pixels: int, seed: int) -> np.ndarray:
+    mod = _load_ustarfm_module()
+    root_30m = open_zarr_group(Path(root_30m_path))
+    dem = mod._to_2d(root_30m["static_30m"]["dem"]["data"][0])
+    world = mod._to_2d(root_30m["static_30m"]["worldcover"]["data"][0])
+    dyn = mod._to_2d(root_30m["static_30m"]["dynamic_world"]["data"][0])
+    X = np.stack([dem, world, dyn], axis=-1).astype(np.float32)
+    return mod.build_class_map(X, n_classes, sample_pixels, seed)
+
+
+@st.cache_data(show_spinner=False)
+def _load_linear_rmse(model_name: str) -> Dict[str, float]:
+    path = ROOT / "metrics" / "linear_baselines" / f"{model_name}_metrics.csv"
+    if not path.exists():
+        return {}
+    df = pd.read_csv(path)
+    out: Dict[str, float] = {}
+    if "time" not in df.columns or "rmse" not in df.columns:
+        return out
+    for _, row in df.iterrows():
+        date_str = str(row["time"])
+        try:
+            rmse = float(row["rmse"])
+        except Exception:
+            rmse = float("nan")
+        out[date_str] = rmse
+    return out
+
+
+def _find_linear_pred_png(model_name: str, date_str: str) -> Optional[Path]:
+    fig = ROOT / "metrics" / "linear_baselines" / "figures" / f"{model_name}_{date_str}_map.png"
+    return fig if fig.exists() else None
+
+
 def _load_arch_v1_module():
     import importlib.util
 
@@ -1078,7 +1326,7 @@ def _load_monthly_product_2d(
 
 def _make_source_specs() -> List[Dict[str, str]]:
     return [
-        {"label": "Landsat LST (daily, 30m)", "root": "madurai_30m", "group": "labels_30m/landsat", "cadence": "daily", "cmap": "inferno"},
+        {"label": "Landsat LST (30m, 16days)", "root": "madurai_30m", "group": "labels_30m/landsat", "cadence": "daily", "cmap": "inferno"},
         {"label": "Sentinel-2 (monthly, 30m)", "root": "madurai_30m", "group": "products_30m/sentinel2", "cadence": "monthly", "cmap": "viridis"},
         {"label": "Sentinel-1 (monthly, 30m)", "root": "madurai_30m", "group": "products_30m/sentinel1", "cadence": "monthly", "cmap": "cividis"},
         {"label": "ERA5 (daily, 30m)", "root": "madurai_30m", "group": "products_30m/era5", "cadence": "daily", "cmap": "plasma"},
@@ -1242,26 +1490,62 @@ patch_size = int(sidebar.selectbox("Patch size", options=[128, 192, 256], index=
 n_stats_samples = int(sidebar.number_input("Input stats samples", min_value=20, max_value=400, value=120, step=20))
 
 cnn_specs = _discover_cnn_lr_hr_models()
-model_options: Dict[str, Dict[str, str]] = {}
+
+model_groups: Dict[str, Dict[str, Dict[str, str]]] = {
+    "Fusion": {},
+    "Linear": {},
+    "CNN": {},
+    "ResNet": {},
+    "HRNet": {},
+    "ConvNeXt": {},
+    "Architecture": {},
+}
+
 for name, spec in cnn_specs.items():
-    label = f"{name} ({spec['arch']})"
-    model_options[label] = {"family": "cnn_lr_hr", "name": name, **spec}
+    label = _label_cnn_lr_hr_run(name)
+    if not label:
+        continue
+    if spec["arch"] == "cnn":
+        pretty = label if label != "cnn model" else "cnn model"
+        model_groups["CNN"][pretty] = {"family": "cnn_lr_hr", "name": name, **spec}
+    elif spec["arch"] == "resnet":
+        model_groups["ResNet"][label] = {"family": "cnn_lr_hr", "name": name, **spec}
+    elif spec["arch"] == "hrnet":
+        model_groups["HRNet"][label] = {"family": "cnn_lr_hr", "name": name, **spec}
+    elif spec["arch"] == "convnext":
+        model_groups["ConvNeXt"][label] = {"family": "cnn_lr_hr", "name": name, **spec}
 
 arch_ckpt = ROOT / "models" / "arch_v1" / "best.pt"
-if arch_ckpt.exists():
-    model_options["arch_v1 base"] = {"family": "arch_v1", "name": "arch_v1_base", "ckpt": str(arch_ckpt)}
-    model_options["arch_v1 residual"] = {"family": "arch_v1", "name": "arch_v1_residual", "ckpt": str(arch_ckpt)}
+cnn_ckpt = ROOT / "models" / "deep_baselines" / "cnn_lr_hr" / "cnn_lr_hr" / "cnn_lr_hr_best.pt"
+arch_ckpt_final = cnn_ckpt if cnn_ckpt.exists() else arch_ckpt
+if arch_ckpt_final.exists():
+    model_groups["Architecture"]["Architecture"] = {"family": "arch_v1", "name": "arch_v1", "ckpt": str(arch_ckpt_final)}
 
-if not model_options:
-    st.error("No model checkpoints found for inference.")
+model_groups["Fusion"]["STARFM (MODIS)"] = {"family": "fusion", "method": "starfm", "source": "modis"}
+model_groups["Fusion"]["STARFM (VIIRS)"] = {"family": "fusion", "method": "starfm", "source": "viirs"}
+model_groups["Fusion"]["USTARFM (MODIS)"] = {"family": "fusion", "method": "ustarfm", "source": "modis"}
+model_groups["Fusion"]["USTARFM (VIIRS)"] = {"family": "fusion", "method": "ustarfm", "source": "viirs"}
+model_groups["Fusion"]["FSDAF (MODIS)"] = {"family": "fusion", "method": "fsdaf", "source": "modis"}
+model_groups["Fusion"]["FSDAF (VIIRS)"] = {"family": "fusion", "method": "fsdaf", "source": "viirs"}
+
+model_groups["Linear"]["ols"] = {"family": "linear", "model": "ols"}
+model_groups["Linear"]["ridge"] = {"family": "linear", "model": "ridge"}
+model_groups["Linear"]["lasso"] = {"family": "linear", "model": "lasso"}
+model_groups["Linear"]["elasticnet"] = {"family": "linear", "model": "elasticnet"}
+
+available_groups = [k for k, v in model_groups.items() if v]
+if not available_groups:
+    st.error("No models found for inference.")
     st.stop()
 
-model_label = st.selectbox("Model", options=list(model_options.keys()))
-model_spec = model_options[model_label]
+group_choice = st.selectbox("Model Group", options=available_groups)
+model_label = st.selectbox("Model", options=list(model_groups[group_choice].keys()))
+model_spec = model_groups[group_choice][model_label]
 
 run_clicked = st.button("Run Super-Resolution")
 
 pred_roi = None
+pred_image_path = None
 hr_roi = None
 rmse_val = float("nan")
 model_name = model_label
@@ -1317,7 +1601,7 @@ if run_clicked:
                 target_sigma=meta["target_sigma"],
                 device=device,
             )
-    else:
+    elif model_spec["family"] == "arch_v1":
         order = ARCH_V1_INPUT_ORDER
         mask_idx = _mask_channel_indices(order, sizes)
         mu_x, sigma_x = compute_input_stats(
@@ -1329,70 +1613,173 @@ if run_clicked:
             n_stats_samples,
             seed=42,
         )
-        arch_mod = _load_arch_v1_module()
-        ch = arch_mod.build_default_channel_indices()
-        model = arch_mod.LSTFusionModel(
-            era5_idx=ch["era5"],
-            s2_idx=ch["s2"],
-            s1_idx=ch["s1"],
-            dem_idx=ch["dem"],
-            world_idx=ch["world"],
-            dyn_idx=ch["dyn"],
-            use_doy=False,
-        )
-        ckpt = torch.load(str(model_spec["ckpt"]), map_location="cpu")
-        state = ckpt.get("model_state") or ckpt.get("model_state_dict") or ckpt
-        base_w = state.get("base.stem.conv.weight")
-        use_doy = False
-        if base_w is not None:
-            use_doy = int(base_w.shape[1]) == len(ch["era5"]) + 1
-        if use_doy:
-            model = arch_mod.LSTFusionModel(
-                era5_idx=ch["era5"],
-                s2_idx=ch["s2"],
-                s1_idx=ch["s1"],
-                dem_idx=ch["dem"],
-                world_idx=ch["world"],
-                dyn_idx=ch["dyn"],
-                use_doy=True,
-            )
-        model.load_state_dict(state, strict=True)
-        model.eval()
+        in_ch = sum(sizes[k] for k in order)
+        model, meta, _ = _load_model_from_checkpoint("cnn", Path(model_spec["ckpt"]), in_ch)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        doy_value = float((selected_date.timetuple().tm_yday - 1) / 365.0)
-        variant = "base" if model_spec["name"].endswith("base") else "residual"
         with st.spinner("Running model inference..."):
-            y_true, y_pred = _predict_full_map_arch_v1(
+            y_true, y_pred = _predict_full_map(
                 model=model,
                 root_30m=root_30m,
                 t_idx=t_idx,
                 m_idx=m_idx,
                 patch_size=patch_size,
+                order=order,
                 mu_x=mu_x,
                 sigma_x=sigma_x,
                 mask_idx=mask_idx,
                 device=device,
-                use_doy=use_doy,
-                variant=variant,
-                doy_value=doy_value,
+                target_mu=meta["target_mu"],
+                target_sigma=meta["target_sigma"],
             )
+    elif model_spec["family"] == "fusion":
+        date_str = selected_date.strftime("%Y-%m-%d")
+        if not _lowres_available(model_spec["source"], modis_files, viirs_files):
+            st.error(f"Data not available for {model_label} on {date_str}.")
+            st.stop()
+        pred_path = _find_fusion_pred(date_str, model_spec["method"], model_spec["source"])
+        if model_spec["method"] == "starfm":
+            fusion_mod = _load_starfm_module()
+        elif model_spec["method"] == "ustarfm":
+            fusion_mod = _load_ustarfm_module()
+        elif model_spec["method"] == "fsdaf":
+            fusion_mod = _load_fsdaf_module()
+        else:
+            st.error("Unsupported fusion method.")
+            st.stop()
+        landsat_group = root_30m["labels_30m"]["landsat"]["data"]
+        if pred_path is not None:
+            pred_full = np.load(pred_path)
+            y_pred = np.asarray(pred_full, dtype=np.float32)
+        else:
+            root_daily = open_zarr_group(MADURAI_ZARR)
+            lowres_group = root_daily["products"][model_spec["source"]]["data"]
+            try:
+                base_idx, F_tb, C_tb = _select_base_idx(
+                    allowed_t,
+                    t_idx,
+                    landsat_group,
+                    lowres_group,
+                    model_spec["source"],
+                    fusion_mod,
+                )
+            except Exception as exc:
+                st.error(str(exc))
+                st.stop()
+            if model_spec["source"] == "modis":
+                C_t = fusion_mod._extract_modis(lowres_group[t_idx])
+            else:
+                C_t = fusion_mod._extract_viirs(lowres_group[t_idx])
+            if not fusion_mod._has_valid(C_t):
+                st.error(f"Data not available for {model_label} on {date_str}.")
+                st.stop()
+            H_hr, W_hr = F_tb.shape
+            H_lr, W_lr = C_tb.shape
+            row_float = np.linspace(0, H_lr - 1, H_hr, dtype=np.float64)
+            col_float = np.linspace(0, W_lr - 1, W_hr, dtype=np.float64)
+            row_map = np.clip(np.rint(row_float).astype(np.int64), 0, H_lr - 1)
+            col_map = np.clip(np.rint(col_float).astype(np.int64), 0, W_lr - 1)
+            if model_spec["method"] == "starfm":
+                y_slices = fusion_mod.build_hr_slices(row_map, H_lr)
+                x_slices = fusion_mod.build_hr_slices(col_map, W_lr)
+                progress = st.progress(0.0)
+                with st.spinner("Running STARFM..."):
+                    y_pred = _starfm_predict_with_progress(
+                        fusion_mod,
+                        F_tb=F_tb,
+                        C_tb_lr=C_tb,
+                        C_t_lr=C_t,
+                        row_float=row_float,
+                        col_float=col_float,
+                        y_slices=y_slices,
+                        x_slices=x_slices,
+                        r_lr=fusion_mod.R_LR,
+                        sigma_d=fusion_mod.SIGMA_D,
+                        sigma_f=fusion_mod.SIGMA_F,
+                        sigma_c=fusion_mod.SIGMA_C,
+                        sigma_t=fusion_mod.SIGMA_T,
+                        min_weight_sum=fusion_mod.MIN_WEIGHT_SUM,
+                        progress=progress,
+                    )
+            elif model_spec["method"] == "ustarfm":
+                progress = st.progress(0.0)
+                with st.spinner("Running USTARFM..."):
+                    progress.progress(0.2)
+                    class_map = _ustarfm_class_map(
+                        str(MADURAI_30M_ZARR),
+                        fusion_mod.N_CLASSES,
+                        fusion_mod.SAMPLE_PIXELS,
+                        fusion_mod.SEED,
+                    )
+                    progress.progress(0.5)
+                    A = fusion_mod.compute_fraction_matrix(
+                        class_map,
+                        (H_lr, W_lr),
+                        row_map,
+                        col_map,
+                        fusion_mod.N_CLASSES,
+                    )
+                    mu_tb = fusion_mod.class_means_from_fine(F_tb, class_map, fusion_mod.N_CLASSES)
+                    c = C_t.reshape(-1).astype(np.float32)
+                    valid = np.isfinite(c)
+                    if valid.sum() < max(10, int(0.05 * c.size)):
+                        st.error(f"Data not available for {model_label} on {date_str}.")
+                        st.stop()
+                    A_v = A[valid]
+                    c_v = c[valid]
+                    AtA_v = (A_v.T @ A_v).astype(np.float32)
+                    I = np.eye(fusion_mod.N_CLASSES, dtype=np.float32)
+                    rhs = (A_v.T @ c_v).astype(np.float32) + fusion_mod.PRIOR_LAMBDA * mu_tb
+                    x = np.linalg.solve(
+                        AtA_v + (fusion_mod.RIDGE_LAMBDA + fusion_mod.PRIOR_LAMBDA) * I,
+                        rhs,
+                    ).astype(np.float32)
+                    y_pred = fusion_mod.render_hr_from_class_temps(class_map, x)
+                    progress.progress(1.0)
+            else:
+                progress = st.progress(0.0)
+                with st.spinner("Running FSDAF..."):
+                    progress.progress(0.3)
+                    C_tb_hr = fusion_mod._bilinear_full(C_tb, row_float, col_float)
+                    C_t_hr = fusion_mod._bilinear_full(C_t, row_float, col_float)
+                    y_pred = (F_tb + (C_t_hr - C_tb_hr)).astype(np.float32)
+                    progress.progress(1.0)
+        y_true = fusion_mod._extract_landsat(landsat_group[t_idx, 0, :, :])
+        if y_pred.shape != y_true.shape:
+            st.error("Fusion prediction shape does not match Landsat grid.")
+            st.stop()
+    elif model_spec["family"] == "linear":
+        date_str = selected_date.strftime("%Y-%m-%d")
+        rmse_map = _load_linear_rmse(model_spec["model"])
+        rmse_val = float(rmse_map.get(date_str, float("nan")))
+        pred_image_path = _find_linear_pred_png(model_spec["model"], date_str)
+        landsat_group = root_30m["labels_30m"]["landsat"]["data"]
+        y_true = landsat_group[t_idx, 0, :, :]
+        scale, offset = _landsat_scale_offset(root_30m)
+        y_true = _landsat_to_celsius(np.asarray(y_true), scale, offset)
+        y_true, _ = _apply_range_mask(y_true)
+    else:
+        st.error("Selected model family not supported.")
+        st.stop()
 
     if grid_transform_30m is not None:
         roi_mask_hr = _build_roi_mask(y_true.shape, grid_transform_30m, grid_crs_30m)
     else:
         landsat_group = open_zarr_group(MADURAI_30M_ZARR)["labels_30m/landsat"]
         roi_mask_hr = _build_roi_mask(y_true.shape, landsat_group.attrs.get("transform"), landsat_group.attrs.get("crs"))
-    rmse_val = _rmse(y_true, y_pred, roi_mask_hr)
-    pred_roi, _ = _roi_crop(y_pred, roi_mask_hr)
+    if model_spec["family"] != "linear":
+        rmse_val = _rmse(y_true, y_pred, roi_mask_hr)
+        pred_roi, _ = _roi_crop(y_pred, roi_mask_hr)
     hr_roi, _ = _roi_crop(y_true, roi_mask_hr)
 
 col1, col2, col3 = st.columns(3)
 col1.metric("RMSE", f"{rmse_val:.3f}" if np.isfinite(rmse_val) else "nan")
-col2.write(f"Selected model: `{model_name}`")
+col2.write(f"Selected model: `{model_label}`")
 col3.write("Landsat band: index 0")
 
 st.subheader("Predicted LST (Madurai ROI)")
-if pred_roi is None:
+if pred_image_path is not None and pred_image_path.exists():
+    st.image(str(pred_image_path), caption="Predicted LST (linear baseline)", width="stretch")
+elif pred_roi is None:
     st.info("Run super-resolution to see predictions.")
 else:
     _plot_heatmap(pred_roi, "inferno", "Predicted LST")
