@@ -1,0 +1,12 @@
+{
+  "year": 2025,
+  "day_dates_considered": 259,
+  "night_dates_available": 106,
+  "matched_night_dates": 99,
+  "missing_night_dates": 160,
+  "min_valid_observations": 20,
+  "min_cooling_observations": 20,
+  "connectivity": 8,
+  "n_regions": 435,
+  "n_ranked_interventions": 435
+}

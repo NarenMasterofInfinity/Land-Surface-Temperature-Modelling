@@ -1,0 +1,20 @@
+{
+  "pred_dir": "outputs/arch_v2_render/starfm_addbias_mean_gate_v2b_2025/npy",
+  "night_pred_dir": "outputs/arch_v2_render/starfm_addbias_mean_gate_v2b_night_2025_fix1/npy",
+  "out_root": "/home/naren-root/Documents/FYP2/Project/actionable_insights",
+  "roi_mask": "outputs/arch_v2_render/starfm_addbias_mean_gate_v2b_2025/meta/madurai_roi_mask.npy",
+  "root_30m": "",
+  "tag": "arch_v2_2025_fix1",
+  "year": 2025,
+  "threshold_mode": "percentile",
+  "hotspot_percentile": 90.0,
+  "hotspot_zscore": 1.5,
+  "chronic_frequency_threshold": 0.3,
+  "min_valid_observations": 20,
+  "min_cooling_observations": 20,
+  "min_region_pixels": 25,
+  "connectivity": 8,
+  "sample_png_every": 30,
+  "vmin": 10.0,
+  "vmax": 70.0
+}

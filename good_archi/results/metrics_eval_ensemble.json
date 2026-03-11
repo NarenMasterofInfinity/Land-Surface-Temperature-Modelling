@@ -1,0 +1,12 @@
+{
+  "rmse": 4.186905384063721,
+  "mae": 3.158747673034668,
+  "bias": 0.10574647039175034,
+  "n_eval": 24595,
+  "n_models": 3,
+  "models": [
+    "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed42",
+    "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed123",
+    "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed999"
+  ]
+}

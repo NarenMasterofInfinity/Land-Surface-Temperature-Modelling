@@ -1,0 +1,181 @@
+seed: 42
+dataset:
+  zarr_path: D:/LST_UHI/dataset/madurai_zarr_transfer/madurai.zarr
+  zarr_30m_path: D:/LST_UHI/dataset/madurai_zarr_transfer/madurai_30m.zarr
+  madurai_zarr: null
+  madurai_30m_zarr: null
+  modis_group: products/modis
+  viirs_group: products/viirs
+  era5_group_daily: products/era5
+  era5_group_30m: products_30m/era5
+  dem_group: static_30m/dem
+  worldcover_group: static_30m/worldcover
+  dynamic_world_group: static_30m/dynamic_world
+  landsat_group: labels_30m/landsat
+  time_daily_group: time/daily
+  roi: madurai
+  grid: 1km
+  target_name: landsat_lst_1km
+  cache_dir: D:\LST_UHI\program\Land-Surface-Temperature-Modelling\basenet_1km\results\cache
+  min_valid_frac_train: 0.75
+  min_valid_frac_eval: 0.6
+  min_valid_frac: 0.6
+  drop_if_both_thermal_invalid: true
+features:
+  use_modis: true
+  use_viirs: true
+  use_era5: true
+  use_dem: true
+  use_landcover: true
+  include_day_night: true
+  thermal_pair_mode: mean
+  max_landcover_classes: 12
+  add_engineered: true
+  add_lags: true
+  lag_days:
+  - 1
+  lag_columns:
+  - modis_day
+  - modis_night
+  - viirs_day
+  - viirs_night
+  add_lag_valid_masks: true
+  use_neighborhood_stats: true
+  neighborhood_kernel: 3
+  neighborhood_columns:
+  - modis_day
+  - viirs_day
+  neighborhood_stats:
+  - mean
+  - std
+  neighborhood_cache: basenet_1km/cache/neighborhood
+qc:
+  qc_mapping: auto
+  unknown_qc_score: 0.5
+sanity:
+  y_c_min: -50
+  y_c_max: 80
+  y_p99_max: 100
+  y_p01_min: -80
+  y_pred_abs_max: 150
+nodata:
+  extra_values:
+  - 149
+  - -9999
+  - 0
+  - 65535
+  - 32767
+  - -32768
+  - 9999
+  - 1.0e20
+units:
+  assume_era5_kelvin: auto
+  modis_scale_auto: true
+  viirs_scale_auto: true
+impute:
+  strategy: median
+  add_nan_masks: true
+splits:
+  mode: date_ranges
+  train_start: '2020-01-01'
+  train_end: '2022-12-31'
+  val_start: '2023-01-01'
+  val_end: '2023-12-31'
+  test_start: '2024-01-01'
+  test_end: '2024-12-31'
+  train_frac: 0.7
+  val_frac: 0.15
+training:
+  require_cuda: true
+  batch_size: 1024
+  epochs: 120
+  lr: 0.001
+  weight_decay: 0.0002
+  patience: 10
+  min_epochs: 10
+  max_bad_epochs: 6
+  lambda_delta: 0.001
+  lambda_bias: 0.0
+  lambda_cal: 0.01
+  huber_delta: 1.0
+  num_workers: 0
+  grad_clip_norm: 1.0
+  use_amp: false
+  qc_weighting: true
+  qc_weight_min: 0.3
+  qc_weight_power: 1.5
+  valid_frac_power: 1.0
+  lr_scheduler: plateau
+  plateau_factor: 0.5
+  plateau_patience: 3
+  min_lr: 1.0e-05
+  loss_type: huber
+  nll_log_sigma_min: -2.0
+  nll_log_sigma_max: 1.0
+  nll_clamp_log_sigma:
+  - -3.0
+  - 2.0
+  aux_delta_loss: true
+  aux_delta_weight: 0.2
+  smoke:
+    enabled: false
+    max_dates_per_split: 14
+    max_train_samples: 50000
+    max_val_samples: 20000
+    epochs: 2
+model:
+  arch: ft_transformer
+  gate_input_keys:
+  - modis_day
+  - modis_night
+  - viirs_day
+  - viirs_night
+  - modis_valid_day
+  - modis_valid_night
+  - viirs_valid_day
+  - viirs_valid_night
+  - modis_qc_score_day
+  - modis_qc_score_night
+  - viirs_qc_score_day
+  - viirs_qc_score_night
+  - doy_sin
+  - doy_cos
+  gate_hidden:
+  - 64
+  - 32
+  corr_hidden:
+  - 256
+  - 256
+  - 256
+  - 128
+  dropout: 0.15
+  layer_norm: true
+  use_calibration_head: false
+  cal_a_range: 0.3
+  cal_b_range: 5.0
+  d_model: 64
+  n_heads: 4
+  n_layers: 3
+  attn_dropout: 0.1
+  ffn_mult: 4
+  moe_num_experts: 4
+  moe_hidden:
+  - 256
+  - 256
+  - 128
+  moe_gate_keys: []
+  heteroscedastic: false
+  use_heteroscedastic: false
+ensemble:
+  enabled: false
+  seeds:
+  - 42
+  - 123
+  - 999
+output:
+  base_dir: D:\LST_UHI\program\Land-Surface-Temperature-Modelling\basenet_1km
+  logs_dir: D:\LST_UHI\program\Land-Surface-Temperature-Modelling\basenet_1km\logs
+  results_dir: D:\LST_UHI\program\Land-Surface-Temperature-Modelling\basenet_1km\results
+  checkpoints_dir: D:\LST_UHI\program\Land-Surface-Temperature-Modelling\basenet_1km\checkpoints
+  tensorboard_dir: D:\LST_UHI\program\Land-Surface-Temperature-Modelling\basenet_1km\results\tensorboard
+  predictions_dir: D:\LST_UHI\program\Land-Surface-Temperature-Modelling\basenet_1km\results\predictions_sample

@@ -1,0 +1,6 @@
+{
+  "model_arch": "ft_transformer",
+  "sigma_mean": null,
+  "gate_entropy_mean": null,
+  "expert_usage_mean": null
+}

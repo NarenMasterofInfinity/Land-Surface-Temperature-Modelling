@@ -1,0 +1,25 @@
+{
+  "config": "basenet_1km/config_ft_full.yaml",
+  "seeds": [
+    42,
+    123,
+    999
+  ],
+  "runs": [
+    {
+      "seed": 42,
+      "run_dir": "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed42",
+      "checkpoint": "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed42/checkpoints/best.pt"
+    },
+    {
+      "seed": 123,
+      "run_dir": "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed123",
+      "checkpoint": "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed123/checkpoints/best.pt"
+    },
+    {
+      "seed": 999,
+      "run_dir": "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed999",
+      "checkpoint": "D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed999/checkpoints/best.pt"
+    }
+  ]
+}

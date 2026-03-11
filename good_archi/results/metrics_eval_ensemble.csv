@@ -1,0 +1,2 @@
+rmse,mae,bias,n_eval,n_models,models
+4.186905384063721,3.158747673034668,0.10574647039175034,24595,3,"['D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed42', 'D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed123', 'D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed999']"

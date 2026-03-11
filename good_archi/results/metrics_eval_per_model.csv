@@ -1,0 +1,4 @@
+run_dir,rmse,mae,bias,n_eval
+D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed42,4.541432857513428,3.497195243835449,0.337205708026886,24595
+D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed123,4.24132776260376,3.2093992233276367,-0.44932007789611816,24595
+D:/LST_UHI/program/Land-Surface-Temperature-Modelling/basenet_1km_seed999,4.175796031951904,3.15750789642334,0.4293539226055145,24595

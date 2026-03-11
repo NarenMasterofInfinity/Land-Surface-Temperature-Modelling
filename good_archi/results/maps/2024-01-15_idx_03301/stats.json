@@ -1,0 +1,49 @@
+{
+  "date_idx": 3301,
+  "date": "2024-01-15",
+  "split": "test",
+  "n_cells": 2650,
+  "n_pred_finite": 737,
+  "n_gt_finite": 961,
+  "n_eval": 703,
+  "rmse": 1.9538904428482056,
+  "mae": 1.5380771160125732,
+  "bias": -0.03656307980418205,
+  "pred_stats": {
+    "min": 26.61226463317871,
+    "mean": 31.65770149230957,
+    "max": 35.132144927978516
+  },
+  "gt_stats": {
+    "min": 25.398635864257812,
+    "mean": 31.766372680664062,
+    "max": 36.50514221191406
+  },
+  "err_stats": {
+    "min": -7.528049468994141,
+    "mean": -0.03656307980418205,
+    "max": 5.797491073608398
+  },
+  "valid_frac_stats": {
+    "min": 0.0,
+    "mean": 0.5579875111579895,
+    "max": 1.0
+  },
+  "qc_weight_stats": {
+    "min": 0.19245007634162903,
+    "mean": 0.538194477558136,
+    "max": 1.0
+  },
+  "paths": {
+    "pred_png": "basenet_1km/results/maps/2024-01-15_idx_03301/pred.png",
+    "gt_png": "basenet_1km/results/maps/2024-01-15_idx_03301/gt.png",
+    "err_png": "basenet_1km/results/maps/2024-01-15_idx_03301/err.png",
+    "valid_frac_png": "basenet_1km/results/maps/2024-01-15_idx_03301/valid_frac.png",
+    "qc_weight_png": "basenet_1km/results/maps/2024-01-15_idx_03301/qc_weight.png",
+    "pred_tif": "basenet_1km/results/maps/2024-01-15_idx_03301/pred.tif",
+    "gt_tif": "basenet_1km/results/maps/2024-01-15_idx_03301/gt.tif",
+    "err_tif": "basenet_1km/results/maps/2024-01-15_idx_03301/err.tif",
+    "valid_frac_tif": "basenet_1km/results/maps/2024-01-15_idx_03301/valid_frac.tif",
+    "qc_weight_tif": "basenet_1km/results/maps/2024-01-15_idx_03301/qc_weight.tif"
+  }
+}
